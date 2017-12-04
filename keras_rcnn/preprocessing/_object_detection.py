@@ -67,6 +67,7 @@ class DictionaryIterator(keras.preprocessing.image.Iterator):
 
         super(DictionaryIterator, self).__init__(len(self.dictionary), batch_size, shuffle, seed)
 
+    @property
     def next(self):
         # Lock indexing to prevent race conditions.
         with self.lock:
@@ -125,6 +126,13 @@ class DictionaryIterator(keras.preprocessing.image.Iterator):
                         label = [0] * (num_classes + 1)
                         label[self.classes[b["class"]]] = 1
                         labels = numpy.append(labels, [[label]], axis=1)
+
+                # check of all boxes are valid, i.e. x1 < x2 and y1 < y2
+                for i, b in enumerate(self.dictionary[image_index]["boxes"]):
+                        if ( b["x1"] >=  b["x2"] ) or ( b["x1"] >=  b["x2"] ):
+                            raise Exception(
+                                "invalid bounding boxes (x1 > x2 or y1 > y2"
+                            )
 
             # Scale the ground truth boxes to the selected image scale.
             boxes[batch_index, :, :4] *= self.scale
