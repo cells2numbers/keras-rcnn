@@ -67,7 +67,6 @@ class DictionaryIterator(keras.preprocessing.image.Iterator):
 
         super(DictionaryIterator, self).__init__(len(self.dictionary), batch_size, shuffle, seed)
 
-    @property
     def next(self):
         # Lock indexing to prevent race conditions.
         with self.lock:
